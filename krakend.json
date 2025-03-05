@@ -1,0 +1,62 @@
+{
+  "$schema": "https://www.krakend.io/schema/krakend.json",
+  "version": 3,
+  "name": "KrakenD - API Gateway",
+  "timeout": "3000ms",
+  "cache_ttl": "300s",
+  "output_encoding": "json",
+
+  "endpoints": [
+    {
+      "endpoint": "/users",
+      "method": "GET",
+      "output_encoding": "json",
+      "backend": [
+        {
+          "url_pattern": "/api",
+          "encoding": "json",
+          "sd": "static",
+          "method": "GET",
+          "host": [
+            "https://randomuser.me/"
+          ],
+          "disable_host_sanitize": false
+        }
+      ],
+      "extra_config": {
+        "auth/validator": {
+          "alg": "RS256",
+          "jwk_url": "http://192.168.0.124:4444/.well-known/jwks.json",
+          "scopes": ["read"],
+          "scopes_key": "scp",
+          "disable_jwk_security": true,
+          "operation_debug": true,
+          "cache": false
+        }
+      }
+    },
+    {
+      "endpoint": "/auth", 
+      "method": "POST",
+      
+     
+      
+      "backend": [
+        {
+          "url_pattern": "/oauth2/token",
+          "encoding": "json",
+          "method": "POST",
+          "sd": "static",
+          "host": [
+            "192.168.0.124:4444"
+          ],
+          "disable_host_sanitize": false
+        }
+      ],
+      "input_headers": [
+        "Content-Type",
+        "Authorization"
+      ]
+    }
+  ]
+}
